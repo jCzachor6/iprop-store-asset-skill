@@ -1,0 +1,10 @@
+{
+  "type": "asset",
+  "title": "Asset Name",
+  "description": "What one seed generates, the canvas size and what is included. One or two sentences, at most 260 characters.",
+  "category": "Pixel Art",
+  "price_eur": 9,
+  "version": "1.0.0",
+  "changelog": "First release.",
+  "sources": "sources"
+}
