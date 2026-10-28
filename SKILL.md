@@ -42,7 +42,9 @@ four gallery slots into the archive. Everything else stays out, because every pa
 3. **README.** Start from `templates/listing/README.md`: entries, canvas size, inputs, outputs, usage, the
    compiler version and the license line.
 4. **Seed previews (optional).** Up to 15 `{entry_path, seed}` pairs in `preview-selection.json`, spread
-   across the entries. `node scripts/render-seeds.mjs <folder>` renders them with the SDK.
+   across the entries. `node scripts/render-seeds.mjs <folder>` renders them with the SDK. The store renders
+   the same pairs at upload (without the file: seeds 1-15 across the entries) and shows them in the seed
+   preview on the asset page; without a cover the first render is the catalog thumbnail.
 5. **Gallery.** Four images at exact sizes: `references/gallery.md`. `render-seeds.mjs --sheet` turns the
    selected seeds into `preview2.webp`. The cover is usually an illustration; say so in the README.
 6. **Check.** `node scripts/check-listing.mjs <folder>` (add `--update` for a new version) applies the
