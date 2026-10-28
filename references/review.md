@@ -1,52 +1,49 @@
 # Rights, content rules and review
 
-## The rights checkbox
+## Rights
 
-Every new listing and version requires ticking:
+Only sell what you can vouch for: your own sources, README and preview images, or material you are
+licensed to resell. No fonts, textures, palettes or reference art copied from others, and no AI output whose
+tool terms forbid resale. Anyone can report a listing or file an IP claim from its product page; a
+confirmed infringement blocks the asset and its owners are notified.
 
-> I own or am licensed to all rights in these source files, README and preview images, selling them here
-> does not infringe anyone else's rights, and I grant the store the license described in the Creator Terms
-> to store, compile, render previews of, display and sell them.
+## What buyers get (standard commercial license)
 
-It is stored as a consent receipt per release. Do not tick it for anything you cannot vouch for: fonts,
-textures, palettes or reference art copied from others, or AI output whose tool terms forbid resale.
+Use of the `.ips` sources and compiled `.iprop` files in any number of their own projects, commercial
+included. They may **not** resell or publish the sources or binaries on their own or as part of another
+asset pack. Write the README so it fits this license: no extra license text, no conflicting "free to
+redistribute" lines.
 
-## What buyers get (Terms of Service §10, Commercial license)
+## Rules reviewers enforce
 
-Perpetual, worldwide, non-exclusive use in any number of their own projects (commercial included). They
-may modify the sources and ship generated images and compiled `.iprop` files inside their products. They
-may **not** resell or publish the sources or binaries on their own, or as part of another asset pack,
-generator or template. Write the README so it fits this license: no extra license text, no conflicting
-"free to redistribute" lines.
-
-## Creator Terms rules reviewers enforce
-
-- Accurate description: contents, what it generates, runtime version and limits.
-- Preview images must be renders of the pack. An illustration (for example the cover) must be labelled as
-  such, for example in the README's Previews section.
-- Price in EUR, VAT included.
-- Not allowed: infringing content or close imitations of other creators' work, unlawful, hateful or sexual
-  content, content harmful to minors, malicious files, misleading listings or catalogue manipulation.
+- Accurate title, description and category: contents, what it generates, canvas size, compiler version.
+- Preview images are renders of the package; an illustration (for example the cover) is labelled as such
+  in the README.
+- Not allowed: infringing content or close imitations of other creators' work, registered trademarks and
+  logos, unlawful, hateful or sexual content, content harmful to minors, malicious files, misleading
+  listings.
 - Published versions are immutable. Fixes go out as new versions.
 
 ## Review flow
 
-1. **Submit for review** in the creator panel → the listing shows **In review**.
-2. Admin opens https://admin.iprop.store → **Products** → the listing. The **Infinite Props release
-   review** widget at the bottom shows the files, the seed previews and the release notes.
-   - **Approve vX.Y.Z** publishes it (or the update).
-   - **Reject release** needs a note of at least 5 characters, which the creator sees next to the listing.
-     Fix the problem and submit a **higher** version; a rejected label cannot be reused.
-3. Approved listings appear in the catalog newest-first. **Unlist** hides a listing but keeps buyers'
-   downloads. **Resubmit for review** puts it back after another approval.
+1. **Submit for review** in the creator panel → the submission is `PENDING_REVIEW`.
+2. The admin opens https://iprop.store/admin/moderation → **Review**: proposed title, description,
+   category and changelog, the current published version (for an update), the package files with the
+   compiled binaries, the compiler version and SHA-256, and earlier attempts.
+   - **Approve** publishes it as the next version (`v1` for a new asset).
+   - **Request changes** (reason required) sends it back; the creator revises and submits again.
+   - **Reject** (reason required) closes the submission.
+   The creator gets an e-mail with the decision and the reason.
+3. Approved assets appear in the catalog newest first. The creator can hide, unhide or change the price in
+   **Products**; an admin can block an asset with a reason.
 
 ## Reviewer checklist
 
 - [ ] Title, description and category match what the sources generate.
+- [ ] `compiler_version` is right and every entry compiled.
 - [ ] Cover reads at thumbnail size; illustration labelled in the README if not a render.
 - [ ] `preview1`-`preview3` are real renders; sizes in labels are true.
-- [ ] Seed previews cover every entry, none empty or near-duplicate.
-- [ ] README explains entries, canvas, inputs, outputs and usage; no images, no conflicting license.
+- [ ] README explains entries, canvas, inputs, outputs and usage; no conflicting license.
 - [ ] No third-party trademarks, logos, characters or copied art.
-- [ ] Price sensible for the content; VAT is included in it.
-- [ ] Version and changelog make sense for an update.
+- [ ] Price sensible for the content (USD).
+- [ ] Changelog makes sense for an update.

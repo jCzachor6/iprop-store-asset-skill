@@ -1,40 +1,51 @@
-# Uploading in the creator panel
+# Uploading to iprop.store
 
-1. Sign in at https://creators.iprop.store (the same email and password as the admin account work). Open
-   **Infinite Props** in the sidebar.
-2. **What are you selling?** Single asset or Pack. It changes to Pack on its own when the sources contain
-   several entries.
-3. **Sources**: add each top-level folder of `sources/` with **Add an asset or pack folder**, and loose
-   files with the file picker. Wait for the **Compilation** panel: every file must show `compiled`, entries
-   as `asset`, imports as `part`.
-4. **Readme**: pick `README.md`.
-5. **Gallery previews**: one file per slot. The panel rejects wrong sizes or formats immediately.
-6. **Version** (1.0.0) and **Release notes**.
-7. **Title** (replace the auto-filled one), **Description**, **Category**, **Commercial license (EUR)**.
-8. **Seed previews**: enter the pairs from `preview-selection.json` in order, then **Render selected
-   previews** and look at them.
-9. Tick the rights checkbox and **Submit for review**.
-10. Approve it in https://admin.iprop.store (Products → listing → Infinite Props release review → Approve).
-    Check the live page at `https://iprop.store/products/<handle>`.
+## Before the first upload
+
+Sign in at https://iprop.store with Google and open the **Creator panel** (`/creator`). Uploading needs an
+ACTIVE creator: save the **Business details** (legal name, business type, country, public registration
+number), then **Connect Stripe** and finish onboarding until the status is ACTIVE.
+
+## First release
+
+1. `node scripts/pack-listing.mjs my-pack` → `my-pack.rar` (RAR4, only the files that ship).
+2. **Creator panel → Assets** (`/creator/assets`): pick `my-pack.rar`, **Upload and validate**. The server
+   validates and compiles in a worker; this takes a few seconds. You get either "Package '…' uploaded and
+   validated." or "Package rejected: CODE: details" (table below).
+3. Open the package to see its files, the compiled `.iprop` files, the entries and the warnings.
+4. **Submissions → New** (`/creator/submissions/new`), choose the package. Title, description and category
+   are pre-filled from `listing.json`; check them, set **Price (USD cents)** (`1200` = $12.00, `0` = free)
+   and the **Changelog**, then **Create draft**.
+5. **Submit for review.** The submission waits in the moderation queue.
+6. An admin reviews it in **Admin → Moderation** (`/admin/moderation`): the package files, compiled
+   binaries, compiler version and SHA-256. **Approve** publishes it as `v1`; **Request changes** or
+   **Reject** need a reason. The creator gets an e-mail either way.
+7. After **Request changes**: upload a fixed package, **Revise** the submission (pick the new package) and
+   submit again. Each submission keeps its attempt history.
+8. Check the live page from the catalog (`/catalog`) and add tags in **Products → Tags**.
 
 ## New version
 
-In the listing row click **New version**. Upload the **complete** source tree again, plus the README.
-Leave the gallery slots empty to keep the current gallery; uploading any slot replaces the whole gallery, so
-upload all four again. The selection is kept unless you change it. Set a higher version and a changelog
-(≥ 5 characters), tick the rights box and submit. Title, description, category and price cannot change
-there; ask the admin.
+Pack and upload the **complete** new package (all sources, README, gallery, selection). In **Products**
+choose **New version** on the asset, pick the package, write a changelog (5-4000 characters) and submit.
+It is reviewed like the first release. After approval it becomes `v2`, `v3`, …; owners get an e-mail and
+the new version appears in their library. Published versions never change.
 
-## Common rejections from the form
+## Rejections on upload
 
 | Message | Fix |
 |---|---|
-| `'x' is not a valid .ips file name` | Rename folders and files: no spaces or dots in folder names. |
-| `A pack must contain at least two assets` / `A single asset listing must contain exactly one asset` | Switch the type, or import or remove the extra entry. |
-| `N of M files failed to compile` | Open the Compilation panel and fix the reported line. |
-| `Seed N failed to render` | The entry traps on a smoke seed; fix the recipe for seeds 1-15. |
-| `Asset canvas exceeds the preview limit` | Canvas ≤ 2048 px per side and ≤ 1 MP. |
-| `'preview.webp' must be 720 × 480px static WebP` | Export at the exact size and format. |
-| `Cannot decode 'preview3.gif' as a safe preview` | Too many frames (≤ 24 at 1440 × 960) or > 3 MiB after re-encoding. |
-| `Use a version such as 1.0.0` / version not newer | Bump `major.minor.patch` above every earlier submission. |
-| `Confirm that you have the rights to sell these files` | Tick the rights checkbox. |
+| `NOT_RAR: only .rar archives are accepted` / `signature check failed` | Pack with `pack-listing.mjs`; ZIP and renamed files are refused. |
+| `CORRUPT: archive cannot be read (UnsupportedRarV5Exception)` | The archive is RAR5 (WinRAR/`rar` default). Pack with `pack-listing.mjs` (RAR4). |
+| `MISSING_LISTING` / `TITLE` / `CATEGORY` / `TYPE` | Fix `listing.json` (`references/fields.md`). |
+| `COMPILER_VERSION` / `COMPILER_UNAVAILABLE` | Add `compiler_version` with a released version (0.7.1 …). For 0.8.0, wait until its GitHub release is published. |
+| `MATERIALS` / `UNUSED_MATERIAL` | Materials need `compiler_version` 0.8.0+; import every material library from an asset (`references/sources.md`). |
+| `MISSING_IPS` / `UNRESOLVED_IMPORT` / `TYPE_MISMATCH` | Fix `sources/` (`references/sources.md`). |
+| `IPROP_UPLOADED` | Remove `.iprop` files; the server compiles. |
+| `COMPILATION_FAILED: … ipc exited 1: …` | Fix the reported file and line; `check-listing.mjs` shows the same message. |
+| `BAD_NAME` / `TOO_DEEP` / `DUPLICATE_PATH` | Rename: no spaces, ≤ 8 folders deep, unique ignoring case. |
+| `LIMIT_UNPACKED` / `TOO_MANY_FILES` | Stay within 5 MiB unpacked and 200 files; shrink the gallery first. |
+| `GALLERY` / `GALLERY_TOO_LARGE` | Exact size and format per slot, ≤ 3 MiB (`references/gallery.md`). |
+| `SELECTION` | Fix `preview-selection.json`: 1-15 unique entry/seed pairs. |
+| `Only an ACTIVE creator may upload asset packages` | Finish business details and Stripe onboarding. |
+| `Too many requests. Try again in a minute.` (HTTP 429) | Uploads and submission actions share a limit of 10 per minute; wait a minute. |

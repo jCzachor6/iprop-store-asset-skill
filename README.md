@@ -1,9 +1,9 @@
 # iprop-store-asset
 
 A Claude Code skill for preparing Infinite Props assets and packs for sale on
-[iprop.store](https://iprop.store): every listing field, the `.ips` source layout, the README, the four
-gallery images, the seed previews, rights and review. It includes two scripts that apply the store's
-exact upload rules locally.
+[iprop.store](https://iprop.store): the listing folder (`listing.json` with `compiler_version`, README,
+`.ips` sources, gallery, seed previews), the store's upload checks, and packing it into the RAR4 `.rar`
+the creator panel takes.
 
 ## Install
 
@@ -11,26 +11,29 @@ exact upload rules locally.
 git clone https://github.com/jCzachor6/iprop-store-asset-skill.git ~/.claude/skills/iprop-store-asset
 ```
 
-Claude Code picks it up when you ask to list, upload or update an asset on the store, or to make its
-previews. Read `SKILL.md` for the workflow.
+Claude Code picks it up when you ask to list, upload or update an asset on the store, pack a listing or
+make its previews. Read `SKILL.md` for the workflow.
 
 ## Scripts
 
-Both need Node 20+ and a mercur checkout for `sharp` and the Infinite Props runtime
-(`MERCUR_DIR`, default `~/Desktop/quants-space/mercur`, with `packages/iprop` built).
+Node 20+. They compile and render with the Infinite Props SDK of the listing's `compiler_version`
+(`IPROP_SDK`, else `~/.cache/iprop-store-asset/compilers`, filled from the GitHub release and SHA-256-checked).
 
 ```sh
-cp -R templates/listing ~/props-store/my-pack        # start a listing folder
-node scripts/check-listing.mjs ~/props-store/my-pack # validate it like the store does
-node scripts/check-listing.mjs ~/props-store/my-pack --update   # a new version
-node scripts/render-gallery.mjs ~/props-store/my-pack           # preview2.webp + preview3.gif from real seeds
+cp -R templates/listing ~/props-store/my-pack            # start a listing folder
+node scripts/check-listing.mjs ~/props-store/my-pack     # validate it like the store does
+node scripts/check-listing.mjs ~/props-store/my-pack --update   # a new version (changelog required)
+node scripts/render-seeds.mjs ~/props-store/my-pack --sheet     # seed renders + gallery/preview2.webp
+node scripts/pack-listing.mjs ~/props-store/my-pack      # check, then write ~/props-store/my-pack.rar
 ```
 
-`check-listing.mjs` exits with 1 when the store would reject the upload.
+`check-listing.mjs` and `pack-listing.mjs` exit with 1 when the store would reject the package.
 
 ## Keeping it in sync
 
-The limits in `scripts/lib/store.mjs` and `references/` mirror mercur's
-`apps/api/src/api/vendor/iprop-packs/validators.ts` and `apps/api/src/lib/iprop/{pack,media,worker}.ts`,
-the vendor form in `apps/vendor/src/routes/infinite-props/` and the categories in
-`apps/api/src/scripts/lib/iprop-catalog.ts`. Update them together when the store changes.
+The rules in `scripts/lib/store.mjs` and `references/` mirror iprop-store
+(github.com/jCzachor6/iprop-store): `asset/validation/RarPackageValidator.java` (package rules),
+`asset/validation/CompileMain.java` (compilation), `asset/ListingCategories.java` (categories),
+`asset/compiler/CompilerRuntimeManager.java` (SDK download) and `app.assets` / `app.compiler` in
+`src/main/resources/application.yml` (limits, released compiler versions). Update them together when the
+store changes.

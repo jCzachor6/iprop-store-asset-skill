@@ -11,7 +11,8 @@ enlarged sprites sharp.
 | `asset-name/asset-name.ips` | What this entry generates and how the seeds vary it. |
 
 Shared parts: `common/part.ips` (imported by …). The download includes the complete `.ips` source
-graph and every entry compiled with Infinite Props 0.7.1.
+graph and every entry compiled by the store with Infinite Props 0.7.1 (the listing's
+`compiler_version`).
 
 ## Inputs
 
@@ -40,4 +41,5 @@ the animation are rendered from the included sources. The seeded previews show N
 
 ## License
 
-Commercial. See section 10 of the iprop.store Terms of Service.
+Standard commercial license of iprop.store: use the sources and compiled files in your own
+projects, commercial included; do not resell or republish them on their own.

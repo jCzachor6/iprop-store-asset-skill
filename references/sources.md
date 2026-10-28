@@ -1,8 +1,8 @@
 # Sources
 
-The store compiles and renders the uploaded `.ips` files itself with the bundled Infinite Props runtime
-(currently **0.7.1**, source language 0.7). Binaries are never uploaded; buyers get the sources plus the
-`.iprop` files the store compiled.
+The store compiles the uploaded `.ips` files itself, with the Infinite Props release named in
+`listing.json` → `compiler_version`. Binaries are never uploaded (`IPROP_UPLOADED`); buyers get the sources
+plus the `.iprop` files the store compiled, each next to its entry.
 
 ## Layout
 
@@ -15,48 +15,65 @@ sources/
   weapons_common/haft.ips  part shared via "../weapons_common/haft.ips"
 ```
 
-- **Entry**: a file no other uploaded file imports. Each entry is one asset with its own seed previews.
-- **Part**: any imported file. Parts ship in the download but cannot be selected for previews.
+- **Entry**: a file no other `.ips` in the package imports. Each entry is compiled to its own `.iprop`.
+- **Part**: any imported file. Parts ship in the download but are not compiled on their own.
 - `type: "asset"` needs exactly one entry, `type: "pack"` two or more. A stray unused file becomes an extra
   entry. Delete it or import it.
-- Imports resolve only against the uploaded tree. `../` may go up to a sibling folder inside it but never
-  outside, and there is no access to host files.
+- Imports are resolved inside the package (`import name from "relative/path.ips"`). An import that points
+  at a file not in the package is rejected (`UNRESOLVED_IMPORT`).
 - Paths in `preview-selection.json` are relative to `sources/` (`sword/sword.ips`).
+
+## Material libraries (0.8.0 and newer)
+
+Infinite Props 0.8.0 adds reusable materials: a `.ips` file with one or more `material Name { ... }`
+definitions and no `asset`. An asset imports it like any other file and qualifies the materials by the
+import alias:
+
+```
+sources/
+  tree/tree.ips              entry: import forest from "materials/forest.ips"; bark = forest.Bark()
+  tree/materials/forest.ips  material library (imported, so not an entry)
+```
+
+- Needs `"compiler_version": "0.8.0"` or newer; with an older version the package is rejected
+  (`MATERIALS`) before compiling.
+- A library must be imported by an asset. One that nothing imports would be an entry with nothing to
+  compile and is rejected (`UNUSED_MATERIAL`).
+- Libraries ship to buyers like parts and are never compiled on their own. Seed previews can only point at
+  asset entries.
+- `ipc <library>.ips --check` checks a library on its own; `check-listing.mjs` compiles the assets that
+  import it.
+
+## How the store compiles
+
+For every entry the worker runs `ipc <entry>.ips -o <entry>.iprop` from the entry's folder with the exact
+declared release (downloaded from github.com/jCzachor6/infinite-props and checked against the release
+SHA-256 sums), then `ipval` on the result. Any compiler error rejects the package with the compiler
+message, for example `COMPILATION_FAILED: sources/potion/potion.ips: ipc exited 1: ipc: vessel.ips:419:23:
+error: unexpected character '@'`.
 
 ## Limits
 
 | Rule | Limit |
 |---|---|
-| Files | 1-64 `.ips` files |
-| File size | ≤ 256 KiB each, ≤ 2 MiB in total |
-| Folder names | letters, digits, `_`, `-`; first character a letter or digit; ≤ 64 chars; ≤ 8 levels; **no spaces or dots** |
-| File names | letters, digits, `.`, `_`, `-`; first character a letter or digit; ≤ 100 chars; must end in `.ips` |
-| Skipped folders | `release/`, `out/`, `.git/` are dropped by the panel's folder picker |
-| Canvas | ≤ 2048 px per side and ≤ 1,048,576 px in total (for example 1024 × 1024) |
-| Compiled binary | ≤ 4 MiB per entry |
-| Fuel | the compiler's 5,000,000 budget; sources cannot raise it |
-| Smoke test | every entry must render seeds **1-15** without trapping |
-| Time | compile + render of the whole listing within 45 s on the shared server (aim for a few seconds locally) |
+| `.ips` files | 1-64, only under `sources/` |
+| `.ips` size | ≤ 256 KiB each, ≤ 2 MiB in total |
+| Compiled binary | ≤ 4 MiB per entry, must pass `ipval` |
+| Compile time | 20 s per entry; the whole validation runs in a worker with a 30 s limit |
+| Names | every folder and file: letters, digits, `.`, `_`, `-`, starting with a letter or digit; **no spaces** |
+| Depth | at most 8 nested folders |
+| Paths | unique ignoring letter case; no links, no absolute paths, no `..` |
+| Whole package | ≤ 200 files, ≤ 5 MiB unpacked (gallery included), `.rar` ≤ 10 MiB, RAR4, not encrypted |
 
-Compilation errors come back with file, line, column and suggestions. `check-listing.mjs` prints the same
-diagnostics locally and reports each entry's canvas, inputs, outputs, binary size and peak fuel.
+The store does not render seeds. `check-listing.mjs` still renders seeds 1-15 and every selected seed with
+`ipgen`, because buyers run every seed: a trap or an empty preview is a broken product even when the
+upload passes.
 
-## Before uploading
+## Before packing
 
-- Remove macOS duplicates (`sword 2/`, `blade 2.ips`), editor backups and experiments.
-- Keep only what the listing sells, plus its parts. Everything uploaded ships to buyers.
-- Make seeds 1-15 look good. They are the store's smoke seeds and, without a selection, the default
-  previews.
+- Remove macOS duplicates (`sword 2/`, `blade 2.ips`), editor backups and experiments. Everything under
+  `sources/` that ends in `.ips` ships to buyers.
+- Make seeds 1-15 look good; they are what buyers try first.
 - Document every declared input and output in the README; buyers need it to drive the asset from code.
-- Update an existing listing only by submitting a new version with the full source tree. Sources are
-  never patched in place.
-
-## In the panel
-
-- Several folders: use **Add an asset or pack folder** once per top-level folder under `sources/`. Files
-  accumulate and the folder names become the path prefix (`sword/…`, `axe/…`), so imports keep working.
-- Loose files at the top of `sources/`: use the **Sources (.ips)** file picker (paths are just the file name).
-- Do not pick `sources/` itself, or every path gets a `sources/` prefix and your
-  `preview-selection.json` paths will not match.
-- The right-hand **Compilation** panel shows each file as `asset` or `part`, its imports and errors.
-  **Clear sources** starts over.
+- Update a published listing only by uploading a complete new package as a new version. Sources are never
+  patched in place.
