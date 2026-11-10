@@ -18,6 +18,8 @@ make its previews. Read `SKILL.md` for the workflow.
 
 Node 20+. They compile and render with the Infinite Props SDK of the listing's `compiler_version`
 (`IPROP_SDK`, else `~/.cache/iprop-store-asset/compilers`, filled from the GitHub release and SHA-256-checked).
+The store accepts Infinite Props 1.0.0 or newer only, and the checks refuse an older `compiler_version`
+the same way.
 
 ```sh
 cp -R templates/listing ~/props-store/my-pack            # start a listing folder

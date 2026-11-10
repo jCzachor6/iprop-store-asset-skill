@@ -34,12 +34,13 @@ export const RULES = {
   smokeSeeds: 15,
 }
 
-// app.compiler.released-versions: the store compiles only with these Infinite Props releases.
-// A listed version is usable once its GitHub release exists (0.8.0 is listed ahead of its release).
-export const RELEASED_COMPILERS = ["0.4.0", "0.5.0", "0.6.0", "0.7.0", "0.7.1", "0.7.2", "0.8.0"]
-export const DEFAULT_COMPILER = "0.7.1"
-// Material libraries (`material Name { ... }` in a .ips file with no asset) need this compiler or newer.
-export const MATERIALS_SINCE = "0.8.0"
+// RarPackageValidator.MINIMUM_COMPILER_VERSION: the store takes packages for Infinite Props 1.0.0 or
+// newer only. An older compiler_version is refused (COMPILER_TOO_OLD), whatever the sources look like.
+export const MINIMUM_COMPILER = "1.0.0"
+// app.compiler.released-versions: of those, the store compiles only with these releases.
+// A listed version is usable once its GitHub release exists.
+export const RELEASED_COMPILERS = ["1.0.0"]
+export const DEFAULT_COMPILER = "1.0.0"
 
 export const compareVersions = (a, b) => {
   const [x, y] = [a, b].map((version) => version.split(".").map(Number))
@@ -121,7 +122,6 @@ const ASSET = /^\s*asset\s+[A-Za-z_]\w*/m
 
 // A material library defines materials and no asset; it only works when an asset imports it.
 export const isMaterialLibrary = (content) => MATERIAL.test(content) && !ASSET.test(content)
-export const definesMaterials = (content) => MATERIAL.test(content)
 
 // Same text scan as the store's validator: an entry is a file no other file imports.
 export const importGraph = (files) => {

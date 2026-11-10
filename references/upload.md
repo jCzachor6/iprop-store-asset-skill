@@ -38,8 +38,10 @@ the new version appears in their library. Published versions never change.
 | `NOT_RAR: only .rar archives are accepted` / `signature check failed` | Pack with `pack-listing.mjs`; ZIP and renamed files are refused. |
 | `CORRUPT: archive cannot be read (UnsupportedRarV5Exception)` | The archive is RAR5 (WinRAR/`rar` default). Pack with `pack-listing.mjs` (RAR4). |
 | `MISSING_LISTING` / `TITLE` / `CATEGORY` / `TYPE` | Fix `listing.json` (`references/fields.md`). |
-| `COMPILER_VERSION` / `COMPILER_UNAVAILABLE` | Add `compiler_version` with a released version (0.7.1 …). For 0.8.0, wait until its GitHub release is published. |
-| `MATERIALS` / `UNUSED_MATERIAL` | Materials need `compiler_version` 0.8.0+; import every material library from an asset (`references/sources.md`). |
+| `COMPILER_VERSION` | Add `compiler_version` to `listing.json` as `x.y.z` (`1.0.0`). |
+| `COMPILER_TOO_OLD: compiler_version 0.8.0 is not accepted; …` | The store takes Infinite Props 1.0.0 or newer. Migrate the sources to the 1.0 language (`references/sources.md`), declare `1.0.0` and check again. |
+| `COMPILER_UNAVAILABLE` | The version is not a release the store lists (today only 1.0.0), or its GitHub release is not published yet. |
+| `UNUSED_MATERIAL` | Import every material library from an asset, or delete it (`references/sources.md`). |
 | `MISSING_IPS` / `UNRESOLVED_IMPORT` / `TYPE_MISMATCH` | Fix `sources/` (`references/sources.md`). |
 | `IPROP_UPLOADED` | Remove `.iprop` files; the server compiles. |
 | `COMPILATION_FAILED: … ipc exited 1: …` | Fix the reported file and line; `check-listing.mjs` shows the same message. |

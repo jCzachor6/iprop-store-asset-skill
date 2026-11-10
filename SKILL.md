@@ -8,7 +8,8 @@ description: Prepare an Infinite Props asset or pack for sale on iprop.store - t
 iprop.store sells Infinite Props `.ips` recipes as a **single asset** or a **pack**. A creator uploads
 **one `.rar` package** in the creator panel (https://iprop.store/creator/assets). The server validates it,
 compiles every entry with the Infinite Props release the package declares (`compiler_version`) and keeps
-the compiled `.iprop` files next to the sources. The creator then fills the submission form (title,
+the compiled `.iprop` files next to the sources. **Only Infinite Props 1.0.0 or newer is accepted**; a
+package for an older release is refused. The creator then fills the submission form (title,
 description, category, price in USD, changelog) and sends it to review. An admin approves it in
 https://iprop.store/admin/moderation and it goes on sale as `v1`.
 
@@ -35,10 +36,10 @@ four gallery slots into the archive. Everything else stays out, because every pa
 
 1. **Sources.** Gather every `.ips` entry and everything it imports under `sources/`, keeping relative
    import paths. An *entry* is a file no other file imports; a *part* is imported. Asset = exactly 1 entry,
-   pack = 2 or more. Material libraries (0.8.0+) are imported like parts. Rules and limits:
-   `references/sources.md`.
+   pack = 2 or more. Material libraries are imported like parts. The sources must be written in the 1.0
+   language. Rules and limits: `references/sources.md`.
 2. **listing.json.** Fill every field, including `compiler_version` (the release the store must compile
-   with, e.g. `0.7.1`). Limits and where buyers see each field: `references/fields.md`.
+   with: `1.0.0` or newer, today `1.0.0`). Limits and where buyers see each field: `references/fields.md`.
 3. **README.** Start from `templates/listing/README.md`: entries, canvas size, inputs, outputs, usage, the
    compiler version and the license line.
 4. **Seed previews (optional).** Up to 15 `{entry_path, seed}` pairs in `preview-selection.json`, spread
@@ -64,12 +65,18 @@ same way the store does.
 
 - **RAR4 only.** The store reads RAR4 archives; a RAR5 file (the WinRAR/`rar` default) is rejected as
   `CORRUPT`. ZIP and other formats are rejected as `NOT_RAR`. Use `pack-listing.mjs`.
-- **`compiler_version` is required** and must be a released version the store accepts (0.4.0, 0.5.0,
-  0.6.0, 0.7.0, 0.7.1, 0.7.2, 0.8.0). The store compiles exactly that version; it never picks one for you.
-  0.8.0 is accepted as soon as its GitHub release is published; until then the download fails
-  (`COMPILER_UNAVAILABLE`).
-- **Materials need 0.8.0.** A `material` definition with an older `compiler_version` is rejected
-  (`MATERIALS`), and a material library no asset imports is rejected (`UNUSED_MATERIAL`).
+- **Only Infinite Props 1.0.0 or newer.** `compiler_version` is required and an older one (0.9.0, 0.8.0, …)
+  is rejected (`COMPILER_TOO_OLD`). It must also be a release the store lists: today that is 1.0.0 alone. A
+  newer release works once the store lists it and its GitHub release is published; until then the upload
+  fails with `COMPILER_UNAVAILABLE`. The store compiles exactly the declared version; it never picks one
+  for you.
+- **Sources written for 0.x do not compile with 1.0.0.** Changing `compiler_version` is not enough: 1.0
+  renamed builtins (`stream_push` → `stream.push`, `noise` → `noise.value`, `fill` → `dist.fill`, …) and
+  tightened names and operators. The compiler error names the new spelling; the whole list is the
+  [migration guide](https://github.com/jCzachor6/infinite-props/blob/main/docs/language/migration-v1.0.md).
+  Migrate, then compare a few seeds with the old renders before packing.
+- **A material library needs an importing asset.** One that no asset imports is rejected
+  (`UNUSED_MATERIAL`).
 - **No `.iprop` in the package.** Uploaded binaries are rejected (`IPROP_UPLOADED`); the server compiles.
 - **5 MiB unpacked for the whole package**, gallery included, and 10 MiB for the `.rar`. Large GIFs eat the
   budget fast.

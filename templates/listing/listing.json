@@ -3,6 +3,6 @@
   "title": "Asset Name",
   "description": "What one seed generates, the canvas size and what is included. One or two sentences, about 260 characters at most.",
   "category": "Pixel Art",
-  "compiler_version": "0.7.1",
+  "compiler_version": "1.0.0",
   "changelog": "First release."
 }

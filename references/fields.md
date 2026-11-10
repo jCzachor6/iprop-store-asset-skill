@@ -9,7 +9,7 @@
   "title": "Weapons Pack",
   "description": "Four procedural pixel-art weapon generators: swords, axes, spears and magic staves. Every seed gives a new 96 × 96 design.",
   "category": "Weapons",
-  "compiler_version": "0.7.1",
+  "compiler_version": "1.0.0",
   "changelog": "First release."
 }
 ```
@@ -20,7 +20,7 @@
 | `title` | Required, 2-120 characters after trimming. | Pre-fills the form's **Title**: product page heading, catalog tile, browser tab, order e-mails |
 | `description` | Optional, ≤ 4000 characters, plain text. Catalog tiles print it in full, so keep it to one or two sentences (about 260 characters): what a seed generates, the canvas size, what is included. | Pre-fills **Description**: catalog tile and product page |
 | `category` | One of the 40 categories below, or none. An unknown name is rejected (`CATEGORY`). | Pre-fills **Category**: catalog filter |
-| `compiler_version` | **Required**, `x.y.z`, a released Infinite Props version the store accepts: 0.4.0, 0.5.0, 0.6.0, 0.7.0, 0.7.1, 0.7.2, 0.8.0 (usable once its GitHub release is out). Materials need 0.8.0 or newer. Missing or malformed: `COMPILER_VERSION`; unknown or not downloadable: `COMPILER_UNAVAILABLE`. | The server compiles every entry with exactly this release |
+| `compiler_version` | **Required**, `x.y.z`, **1.0.0 or newer**: an older version is rejected (`COMPILER_TOO_OLD`). It must also be a release the store lists, today only 1.0.0; a newer one is usable once the store lists it and its GitHub release is out. Missing or malformed: `COMPILER_VERSION`; not listed or not downloadable: `COMPILER_UNAVAILABLE`. | The server compiles every entry with exactly this release |
 | `changelog` | Optional, ≤ 4000 characters. The form has its own **Changelog** field (required, 5-4000 characters, for a new version); paste it there. | Version history on the product page and in moderation |
 | `price_eur`, `price`, `version`, `sources` | Not used. `price_eur`/`version` give a warning: the price is entered in the form in USD cents and versions are numbered `v1`, `v2`, … by the store. The tree is always read from `sources/`. | — |
 

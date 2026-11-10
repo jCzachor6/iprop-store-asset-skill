@@ -11,7 +11,7 @@ enlarged sprites sharp.
 | `asset-name/asset-name.ips` | What this entry generates and how the seeds vary it. |
 
 Shared parts: `common/part.ips` (imported by …). The download includes the complete `.ips` source
-graph and every entry compiled by the store with Infinite Props 0.7.1 (the listing's
+graph and every entry compiled by the store with Infinite Props 1.0.0 (the listing's
 `compiler_version`).
 
 ## Inputs

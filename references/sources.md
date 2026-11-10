@@ -4,6 +4,15 @@ The store compiles the uploaded `.ips` files itself, with the Infinite Props rel
 `listing.json` → `compiler_version`. Binaries are never uploaded (`IPROP_UPLOADED`); buyers get the sources
 plus the `.iprop` files the store compiled, each next to its entry.
 
+The store accepts **Infinite Props 1.0.0 or newer** only (`COMPILER_TOO_OLD` below that), so the sources
+must be written in the 1.0 language. Files written for 0.x do not compile with 1.0.0: builtins were
+renamed (`stream_push` → `stream.push`, `noise` → `noise.value`, `fault` → `noise.fault`,
+`fill` → `dist.fill`, `color.set.a` → `color.set_a`), `poly` takes its colour last, and names and
+operators follow stricter rules. Each compiler error names the replacement; the
+[migration guide](https://github.com/jCzachor6/infinite-props/blob/main/docs/language/migration-v1.0.md)
+lists them all. A source migrated from 0.9 renders the same image for the same seed; compare a few seeds
+with your old renders anyway, above all when the source is older than 0.9.
+
 ## Layout
 
 ```
@@ -23,11 +32,10 @@ sources/
   at a file not in the package is rejected (`UNRESOLVED_IMPORT`).
 - Paths in `preview-selection.json` are relative to `sources/` (`sword/sword.ips`).
 
-## Material libraries (0.8.0 and newer)
+## Material libraries
 
-Infinite Props 0.8.0 adds reusable materials: a `.ips` file with one or more `material Name { ... }`
-definitions and no `asset`. An asset imports it like any other file and qualifies the materials by the
-import alias:
+A material library is a `.ips` file with one or more `material Name { ... }` definitions and no `asset`.
+An asset imports it like any other file and qualifies the materials by the import alias:
 
 ```
 sources/
@@ -35,8 +43,6 @@ sources/
   tree/materials/forest.ips  material library (imported, so not an entry)
 ```
 
-- Needs `"compiler_version": "0.8.0"` or newer; with an older version the package is rejected
-  (`MATERIALS`) before compiling.
 - A library must be imported by an asset. One that nothing imports would be an entry with nothing to
   compile and is rejected (`UNUSED_MATERIAL`).
 - Libraries ship to buyers like parts and are never compiled on their own. Seed previews can only point at

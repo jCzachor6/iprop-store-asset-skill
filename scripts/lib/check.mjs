@@ -6,8 +6,8 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from "node:fs
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import {
-  CATEGORIES, COMPILER_VERSION, DEFAULT_COMPILER, GALLERY, MATERIALS_SINCE, README_NAME, RELEASED_COMPILERS, RULES,
-  SEGMENT, compareVersions, definesMaterials, findSdk, imageInfo, importGraph, isMaterialLibrary, packageFiles,
+  CATEGORIES, COMPILER_VERSION, DEFAULT_COMPILER, GALLERY, MINIMUM_COMPILER, README_NAME, RELEASED_COMPILERS, RULES,
+  SEGMENT, compareVersions, findSdk, imageInfo, importGraph, isMaterialLibrary, packageFiles,
   pngIsEmpty, readJson, walkSources,
 } from "./store.mjs"
 
@@ -62,6 +62,8 @@ export const checkListing = (root, { update = false, compile = true, fetch = tru
   let compilerOk = false
   if (typeof compiler !== "string" || !COMPILER_VERSION.test(compiler)) {
     error(`compiler_version is required as x.y.z: the Infinite Props release the store compiles with (for example "${DEFAULT_COMPILER}")`)
+  } else if (compareVersions(compiler, MINIMUM_COMPILER) < 0) {
+    error(`compiler_version ${compiler} is not accepted: the store takes packages for Infinite Props ${MINIMUM_COMPILER} or newer. Bring the sources to the 1.0 language and declare "${DEFAULT_COMPILER}"`)
   } else if (!RELEASED_COMPILERS.includes(compiler)) {
     error(`compiler_version ${compiler} is not a released Infinite Props version the store accepts (${RELEASED_COMPILERS.join(", ")})`)
   } else {
@@ -121,11 +123,6 @@ export const checkListing = (root, { update = false, compile = true, fetch = tru
   const graph = importGraph(files)
   for (const missing of graph.unresolved) error(`sources/${missing.from}: import "${missing.import}" is not in the package`)
   const entries = graph.entries
-  const materialFiles = files.filter((file) => definesMaterials(file.content))
-  if (materialFiles.length && compilerOk && compareVersions(compiler, MATERIALS_SINCE) < 0) {
-    compilerOk = false
-    error(`${materialFiles.map((file) => `sources/${file.path}`).join(", ")} ${materialFiles.length === 1 ? "defines" : "define"} materials, which need compiler_version ${MATERIALS_SINCE} or newer (declared ${compiler})`)
-  }
   for (const file of files) {
     if (entries.includes(file.path) && isMaterialLibrary(file.content)) {
       error(`sources/${file.path} is a material library that no asset imports; import it from an asset or delete it`)
