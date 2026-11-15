@@ -43,7 +43,8 @@ redistribute" lines.
 - [ ] `compiler_version` is right and every entry compiled.
 - [ ] Cover reads at thumbnail size; illustration labelled in the README if not a render.
 - [ ] `preview1`-`preview3` are real renders; sizes in labels are true.
-- [ ] README explains entries, canvas, inputs, outputs and usage; no conflicting license.
+- [ ] README explains entries, canvas, inputs, outputs (a normal map and its 1.1 runtime too) and usage; no
+  conflicting license.
 - [ ] No third-party trademarks, logos, characters or copied art.
 - [ ] Price sensible for the content (USD).
 - [ ] Changelog makes sense for an update.

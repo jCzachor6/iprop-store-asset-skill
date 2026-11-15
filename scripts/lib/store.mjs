@@ -39,8 +39,8 @@ export const RULES = {
 export const MINIMUM_COMPILER = "1.0.0"
 // app.compiler.released-versions: of those, the store compiles only with these releases.
 // A listed version is usable once its GitHub release exists.
-export const RELEASED_COMPILERS = ["1.0.0"]
-export const DEFAULT_COMPILER = "1.0.0"
+export const RELEASED_COMPILERS = ["1.0.0", "1.1.0"]
+export const DEFAULT_COMPILER = "1.1.0"
 
 export const compareVersions = (a, b) => {
   const [x, y] = [a, b].map((version) => version.split(".").map(Number))

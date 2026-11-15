@@ -11,7 +11,7 @@ enlarged sprites sharp.
 | `asset-name/asset-name.ips` | What this entry generates and how the seeds vary it. |
 
 Shared parts: `common/part.ips` (imported by …). The download includes the complete `.ips` source
-graph and every entry compiled by the store with Infinite Props 1.0.0 (the listing's
+graph and every entry compiled by the store with Infinite Props 1.1.0 (the listing's
 `compiler_version`).
 
 ## Inputs
@@ -21,6 +21,8 @@ graph and every entry compiled by the store with Infinite Props 1.0.0 (the listi
 ## Outputs
 
 - `anchor_name`: attachment point in native canvas coordinates.
+- `normal_name` (only with `output normal`): the normal map for lighting the sprite, linear
+  data with green up. Loading the asset needs an Infinite Props 1.1 runtime.
 
 ## Usage
 

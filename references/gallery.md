@@ -33,7 +33,8 @@ are validated, stored and shipped now, so make them right; they appear once the 
   promotional artwork. Keep the prompt in `cover-prompt.md` (never packed).
 
 **`preview1.webp`: overview (1440 × 960).** Real renders: one card per entry (pack) or the main variations
-(asset), with the entry name, canvas size and what the inputs control.
+(asset), with the entry name, canvas size and what the inputs control. Entries with a normal map get a
+lit render beside the plain one (below).
 
 **`preview2.webp`: range (1440 × 960).** A contact sheet of real seeds.
 
@@ -55,6 +56,10 @@ It compiles with the declared `compiler_version` (`ipc`), renders the pairs from
 store background. `renders/` is never packed. For a custom layout (cards per entry, labels, input sweeps,
 the GIF), compose the PNGs in your own tool; `ipgen <file.iprop> --seed N --uniform name=value -o out.png`
 renders any variant.
+
+The store's seed previews show the colour image only. For an entry that publishes a normal map,
+`ipsheet <file.iprop> --seed N --seeds 1 --image lit -o lit.png` renders seed N lit from the upper left,
+with the same transparency as the plain render; `--image normal` draws the map itself (opaque).
 
 ## Seed previews (`preview-selection.json`)
 

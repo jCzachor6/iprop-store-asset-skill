@@ -37,11 +37,12 @@ four gallery slots into the archive. Everything else stays out, because every pa
 1. **Sources.** Gather every `.ips` entry and everything it imports under `sources/`, keeping relative
    import paths. An *entry* is a file no other file imports; a *part* is imported. Asset = exactly 1 entry,
    pack = 2 or more. Material libraries are imported like parts. The sources must be written in the 1.0
-   language. Rules and limits: `references/sources.md`.
+   language; 1.1 adds normal maps and named seeds. Rules and limits: `references/sources.md`.
 2. **listing.json.** Fill every field, including `compiler_version` (the release the store must compile
-   with: `1.0.0` or newer, today `1.0.0`). Limits and where buyers see each field: `references/fields.md`.
-3. **README.** Start from `templates/listing/README.md`: entries, canvas size, inputs, outputs, usage, the
-   compiler version and the license line.
+   with: `1.0.0` or newer, today `1.1.0`, which normal maps and named seeds need). Limits and where buyers
+   see each field: `references/fields.md`.
+3. **README.** Start from `templates/listing/README.md`: entries, canvas size, inputs, outputs (a normal
+   map too), usage, the compiler version and the license line.
 4. **Seed previews (optional).** Up to 15 `{entry_path, seed}` pairs in `preview-selection.json`, spread
    across the entries. `node scripts/render-seeds.mjs <folder>` renders them with the SDK. The store renders
    the same pairs at upload (without the file: seeds 1-15 across the entries) and shows them in the seed
@@ -66,15 +67,19 @@ same way the store does.
 - **RAR4 only.** The store reads RAR4 archives; a RAR5 file (the WinRAR/`rar` default) is rejected as
   `CORRUPT`. ZIP and other formats are rejected as `NOT_RAR`. Use `pack-listing.mjs`.
 - **Only Infinite Props 1.0.0 or newer.** `compiler_version` is required and an older one (0.9.0, 0.8.0, …)
-  is rejected (`COMPILER_TOO_OLD`). It must also be a release the store lists: today that is 1.0.0 alone. A
+  is rejected (`COMPILER_TOO_OLD`). It must also be a release the store lists: today 1.0.0 and 1.1.0. A
   newer release works once the store lists it and its GitHub release is published; until then the upload
   fails with `COMPILER_UNAVAILABLE`. The store compiles exactly the declared version; it never picks one
   for you.
-- **Sources written for 0.x do not compile with 1.0.0.** Changing `compiler_version` is not enough: 1.0
-  renamed builtins (`stream_push` → `stream.push`, `noise` → `noise.value`, `fill` → `dist.fill`, …) and
-  tightened names and operators. The compiler error names the new spelling; the whole list is the
+- **Sources written for 0.x do not compile with 1.0.0 or 1.1.0.** Changing `compiler_version` is not
+  enough: 1.0 renamed builtins (`stream_push` → `stream.push`, `noise` → `noise.value`, `fill` → `dist.fill`,
+  …) and tightened names and operators. The compiler error names the new spelling; the whole list is the
   [migration guide](https://github.com/jCzachor6/infinite-props/blob/main/docs/language/migration-v1.0.md).
   Migrate, then compare a few seeds with the old renders before packing.
+- **Normal maps and named seeds need 1.1.0.** `output normal`, `.normal(...)`, `encoding = surface.normal`,
+  `color.normal`, `seed.initial()` and `.fork(...)` are new in 1.1; with `compiler_version` 1.0.0 the
+  compile fails (`COMPILATION_FAILED`). A normal map or `seed.initial()` also needs a 1.1 runtime in the
+  buyer's engine: say so in the README.
 - **A material library needs an importing asset.** One that no asset imports is rejected
   (`UNUSED_MATERIAL`).
 - **No `.iprop` in the package.** Uploaded binaries are rejected (`IPROP_UPLOADED`); the server compiles.

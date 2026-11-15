@@ -5,8 +5,8 @@ The store compiles the uploaded `.ips` files itself, with the Infinite Props rel
 plus the `.iprop` files the store compiled, each next to its entry.
 
 The store accepts **Infinite Props 1.0.0 or newer** only (`COMPILER_TOO_OLD` below that), so the sources
-must be written in the 1.0 language. Files written for 0.x do not compile with 1.0.0: builtins were
-renamed (`stream_push` → `stream.push`, `noise` → `noise.value`, `fault` → `noise.fault`,
+must be written in the 1.0 language. Files written for 0.x do not compile with 1.0.0 or 1.1.0: builtins
+were renamed (`stream_push` → `stream.push`, `noise` → `noise.value`, `fault` → `noise.fault`,
 `fill` → `dist.fill`, `color.set.a` → `color.set_a`), `poly` takes its colour last, and names and
 operators follow stricter rules. Each compiler error names the replacement; the
 [migration guide](https://github.com/jCzachor6/infinite-props/blob/main/docs/language/migration-v1.0.md)
@@ -49,6 +49,22 @@ sources/
   asset entries.
 - `ipc <library>.ips --check` checks a library on its own; `check-listing.mjs` compiles the assets that
   import it.
+
+## Normal maps and named seeds (1.1)
+
+Infinite Props 1.1 adds normal maps (`output normal`, `.normal(depth, smoothing)`,
+`layer n(encoding = surface.normal)`, `color.normal`) and named seeds (`seed.initial()`, `x.fork("name")`,
+`x.fork(i)`, the `seed` type); see the 1.1
+[migration guide](https://github.com/jCzachor6/infinite-props/blob/main/docs/language/migration-v1.1.md).
+Nothing else changes: a 1.0 source compiles to the same bytes with 1.1.0.
+
+- A source that uses any of them needs `"compiler_version": "1.1.0"`. The 1.0.0 compiler rejects it with
+  an error that does not name the fix (`expected an output kind (...), got identifier`,
+  `i32 has no method 'initial'`); `check-listing.mjs` warns about it.
+- An entry that publishes a normal map or calls `seed.initial()` needs a 1.1 runtime: a 1.0 runtime
+  refuses to load it. Say so in the README and document the normal output like any other output.
+- Rewriting an old `hash(seed ^ K)` key as a fork gives each seed a different picture. In a new version of
+  a published asset, say so in the changelog.
 
 ## How the store compiles
 

@@ -13,6 +13,13 @@ import {
 
 export const bytes = (n) => n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(2)} MiB` : `${(n / 1024).toFixed(1)} KiB`
 
+// Normal maps and named seeds are new in Infinite Props 1.1. Not a store rule: with an older
+// compiler_version the store only reports the compiler's error (COMPILATION_FAILED), which does not
+// name the fix.
+const LANGUAGE_1_1 = "1.1.0"
+const NEW_IN_1_1 = /^\s*output\s+normal\b|\.normal\s*\(|\bsurface\.normal\b|\bseed\.initial\s*\(|\.fork\s*\(/m
+const COMMENTS = /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g
+
 export const checkListing = (root, { update = false, compile = true, fetch = true } = {}) => {
   const errors = []
   const warnings = []
@@ -127,6 +134,10 @@ export const checkListing = (root, { update = false, compile = true, fetch = tru
     if (entries.includes(file.path) && isMaterialLibrary(file.content)) {
       error(`sources/${file.path} is a material library that no asset imports; import it from an asset or delete it`)
     }
+  }
+  const newer = files.filter((file) => NEW_IN_1_1.test(file.content.replace(COMMENTS, "")))
+  if (newer.length && compilerOk && compareVersions(compiler, LANGUAGE_1_1) < 0) {
+    warn(`${newer.map((file) => `sources/${file.path}`).join(", ")} ${newer.length === 1 ? "uses" : "use"} normal maps or named seeds, which need compiler_version ${LANGUAGE_1_1} or newer (declared ${compiler})`)
   }
   if (files.length) note(`${files.length} .ips files (${bytes(ipsTotal)}), ${entries.length} ${entries.length === 1 ? "entry" : "entries"}: ${entries.join(", ")}`)
   if (type === "asset" && entries.length !== 1) error(`a single asset needs exactly 1 entry, found ${entries.length}; set "type": "pack" or import the extra files`)
